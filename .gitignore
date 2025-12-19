@@ -1,1 +1,53 @@
+# Fichiers de configuration et cache
+.env
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Base de données SQLite
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# Logs
+logs/
+*.log
+
+# Cache et fichiers temporaires
+.cache/
+tmp/
+temp/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# IDEs et éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+
+# Certificats SSL (si utilisés en production)
+*.pem
+*.key
+*.cert
+
+# Variables d'environnement de production
+.env.production
+.env.local
+
+# Couverture de tests
+coverage/
+.nyc_output/
+
+# Dossiers de build
+dist/
+build/
