@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration du Serveur Discord</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #7289da, #99aab5);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .guild-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d5edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+
+        .help-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚙️</div>
+            <h1>Configuration du Serveur</h1>
+            <p>Configurez les paramètres de vérification pour votre serveur Discord</p>
+        </div>
+
+        <div id="alerts"></div>
+
+        <div class="guild-info">
+            <h3 id="guildName">Chargement...</h3>
+            <p id="guildId">ID du serveur: Chargement...</p>
+        </div>
+
+        <form id="configForm">
+            <div class="section">
+                <div class="section-title">🎯 Configuration des Rôles</div>
+                
+                <div class="form-group">
+                    <label for="verifiedRoleId">ID du Rôle Vérifié *</label>
+                    <input type="text" id="verifiedRoleId" name="verified_role_id" required>
+                    <div class="help-text">ID du rôle à attribuer aux utilisateurs vérifiés</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="adminRoleId">ID du Rôle Admin (optionnel)</label>
+                    <input type="text" id="adminRoleId" name="admin_role_id">
+                    <div class="help-text">Rôle supplémentaire pour administrer la configuration</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📺 Configuration YouTube</div>
+                
+                <div class="form-group">
+                    <label for="youtubeChannelId">ID de la Chaîne YouTube</label>
+                    <input type="text" id="youtubeChannelId" name="youtube_channel_id" placeholder="UCExempleChannelId123456789">
+                    <div class="help-text">ID de la chaîne YouTube (commence par UC...)</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📱 Configuration Twitch</div>
+                
+                <div class="form-group">
+                    <label for="twitchChannelName">Nom de la Chaîne Twitch</label>
+                    <input type="text" id="twitchChannelName" name="twitch_channel_name" placeholder="nom_utilisateur_twitch">
+                    <div class="help-text">Nom d'utilisateur de la chaîne Twitch (sans @)</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">✅ Exigences de Vérification</div>
+                
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="requireYoutube" name="require_youtube">
+                        <label for="requireYoutube">Exiger un abonnement YouTube</label>
+                    </div>
+                    
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="requireTwitchFollow" name="require_twitch_follow">
+                        <label for="requireTwitchFollow">Exiger un follow Twitch</label>
+                    </div>
+                    
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="requireTwitchSub" name="require_twitch_sub">
+                        <label for="requireTwitchSub">Exiger un abonnement Twitch</label>
+                    </div>
+                    
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="autoAssignRole" name="auto_assign_role" checked>
+                        <label for="autoAssignRole">Attribution automatique du rôle</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-success">💾 Sauvegarder</button>
+                <button type="button" class="btn btn-secondary" onclick="validateConfig()">🔍 Valider</button>
+                <a href="/" class="btn btn-primary">🏠 Accueil</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const guildId = window.location.pathname.split('/').pop();
+        let currentConfig = null;
+
+        // Charger la configuration au chargement de la page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadGuildConfig();
+        });
+
+        async function loadGuildConfig() {
+            try {
+                const response = await fetch(`/config/guild/${guildId}`);
+                const data = await response.json();
+
+                document.getElementById('guildId').textContent = `ID du serveur: ${guildId}`;
+
+                if (data.exists && data.config) {
+                    currentConfig = data.config;
+                    document.getElementById('guildName').textContent = data.config.guild_name;
+                    
+                    // Remplir le formulaire
+                    document.getElementById('verifiedRoleId').value = data.config.verified_role_id || '';
+                    document.getElementById('adminRoleId').value = data.config.admin_role_id || '';
+                    document.getElementById('youtubeChannelId').value = data.config.youtube_channel_id || '';
+                    document.getElementById('twitchChannelName').value = data.config.twitch_channel_name || '';
+                    
+                    document.getElementById('requireYoutube').checked = data.config.require_youtube;
+                    document.getElementById('requireTwitchFollow').checked = data.config.require_twitch_follow;
+                    document.getElementById('requireTwitchSub').checked = data.config.require_twitch_sub;
+                    document.getElementById('autoAssignRole').checked = data.config.auto_assign_role;
+
+                    showAlert('Configuration chargée avec succès', 'success');
+                } else {
+                    document.getElementById('guildName').textContent = 'Nouveau Serveur';
+                    showAlert('Aucune configuration trouvée. Créez une nouvelle configuration.', 'info');
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement:', error);
+                showAlert('Erreur lors du chargement de la configuration', 'error');
+            }
+        }
+
+        document.getElementById('configForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await saveConfig();
+        });
+
+        async function saveConfig() {
+            const formData = new FormData(document.getElementById('configForm'));
+            const config = {
+                guild_name: document.getElementById('guildName').textContent,
+                verified_role_id: formData.get('verified_role_id'),
+                admin_role_id: formData.get('admin_role_id'),
+                youtube_channel_id: formData.get('youtube_channel_id'),
+                twitch_channel_name: formData.get('twitch_channel_name'),
+                require_youtube: formData.has('require_youtube'),
+                require_twitch_follow: formData.has('require_twitch_follow'),
+                require_twitch_sub: formData.has('require_twitch_sub'),
+                auto_assign_role: formData.has('auto_assign_role')
+            };
+
+            try {
+                const response = await fetch(`/config/guild/${guildId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showAlert('Configuration sauvegardée avec succès !', 'success');
+                    currentConfig = result.config;
+                } else {
+                    showAlert(result.error || 'Erreur lors de la sauvegarde', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde:', error);
+                showAlert('Erreur de connexion lors de la sauvegarde', 'error');
+            }
+        }
+
+        async function validateConfig() {
+            try {
+                const response = await fetch(`/config/guild/${guildId}/validate`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                let message = '';
+                if (result.valid) {
+                    message = '✅ Configuration valide !';
+                    showAlert(message, 'success');
+                } else {
+                    message = '❌ Erreurs trouvées:\n' + result.errors.join('\n');
+                    if (result.warnings && result.warnings.length > 0) {
+                        message += '\n\n⚠️ Avertissements:\n' + result.warnings.join('\n');
+                    }
+                    showAlert(message, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la validation:', error);
+                showAlert('Erreur lors de la validation', 'error');
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertsContainer = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = message.replace(/\n/g, '<br>');
+            
+            alertsContainer.innerHTML = '';
+            alertsContainer.appendChild(alert);
+
+            // Faire disparaître après 5 secondes
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

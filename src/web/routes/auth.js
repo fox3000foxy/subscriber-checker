@@ -85,11 +85,11 @@ router.get('/youtube/callback', async (req, res) => {
         const tokenData = tokenResponse.data;
 
         // Créer ou récupérer l'utilisateur
-        db.createUser(stateData.discord_id, stateData.discord_username);
-        const user = db.getUser(stateData.discord_id);
+        await db.createUser(stateData.discord_id, stateData.discord_username);
+        const user = await db.getUser(stateData.discord_id);
 
         // Sauvegarder le token YouTube
-        db.saveYouTubeToken(user.id, tokenData);
+        await db.saveYouTubeToken(user.id, tokenData);
 
         res.send(`
             <html>
@@ -107,7 +107,7 @@ router.get('/youtube/callback', async (req, res) => {
                         <p>Votre compte YouTube a été lié avec succès.</p>
                         <p>Vous pouvez fermer cette fenêtre et retourner sur Discord.</p>
                         <script>
-                            setTimeout(() => window.close(), 3000);
+                            setTimeout(() => window.close()2000);
                         </script>
                     </div>
                 </body>
@@ -183,11 +183,11 @@ router.get('/twitch/callback', async (req, res) => {
         const tokenData = tokenResponse.data;
 
         // Créer ou récupérer l'utilisateur
-        db.createUser(stateData.discord_id, stateData.discord_username);
-        const user = db.getUser(stateData.discord_id);
+        await db.createUser(stateData.discord_id, stateData.discord_username);
+        const user = await db.getUser(stateData.discord_id);
 
         // Sauvegarder le token Twitch
-        db.saveTwitchToken(user.id, tokenData);
+        await db.saveTwitchToken(user.id, tokenData);
 
         res.send(`
             <html>
@@ -205,7 +205,7 @@ router.get('/twitch/callback', async (req, res) => {
                         <p>Votre compte Twitch a été lié avec succès.</p>
                         <p>Vous pouvez fermer cette fenêtre et retourner sur Discord.</p>
                         <script>
-                            setTimeout(() => window.close(), 3000);
+                            setTimeout(() => window.close()2000);
                         </script>
                     </div>
                 </body>
@@ -221,28 +221,34 @@ router.get('/twitch/callback', async (req, res) => {
 /**
  * Route pour déconnecter un compte
  */
-router.delete('/:platform/:discordId', (req, res) => {
+router.delete('/:platform/:discordId', async (req, res) => {
     const { platform, discordId } = req.params;
 
     try {
-        const user = db.getUser(discordId);
+        const user = await db.getUser(discordId);
         if (!user) {
             return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
-        if (platform === 'youtube') {
-            // Supprimer les tokens YouTube (la base de données se charge du nettoyage)
-            const stmt = db.db.prepare('DELETE FROM youtube_tokens WHERE user_id = ?');
-            stmt.run(user.id);
-        } else if (platform === 'twitch') {
-            // Supprimer les tokens Twitch
-            const stmt = db.db.prepare('DELETE FROM twitch_tokens WHERE user_id = ?');
-            stmt.run(user.id);
-        } else {
-            return res.status(400).json({ error: 'Plateforme non supportée' });
-        }
-
-        res.json({ success: true, message: `Compte ${platform} déconnecté avec succès` });
+        return new Promise((resolve) => {
+            if (platform === 'youtube') {
+                // Supprimer les tokens YouTube
+                db.db.run('DELETE FROM youtube_tokens WHERE user_id = ?', [user.id], (err) => {
+                    if (err) throw err;
+                    resolve();
+                });
+            } else if (platform === 'twitch') {
+                // Supprimer les tokens Twitch
+                db.db.run('DELETE FROM twitch_tokens WHERE user_id = ?', [user.id], (err) => {
+                    if (err) throw err;
+                    resolve();
+                });
+            } else {
+                return res.status(400).json({ error: 'Plateforme non supportée' });
+            }
+        }).then(() => {
+            res.json({ success: true, message: `Compte ${platform} déconnecté avec succès` });
+        });
 
     } catch (error) {
         console.error('Erreur lors de la déconnexion:', error);

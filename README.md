@@ -52,7 +52,7 @@ TWITCH_CLIENT_SECRET=votre_twitch_client_secret
 TWITCH_CHANNEL_NAME=votre_nom_chaine_twitch
 
 # Serveur web
-WEB_PORT=3000
+WEB_PORT=8458
 SESSION_SECRET=votre_session_secret_aleatoire
 ```
 
@@ -63,12 +63,12 @@ SESSION_SECRET=votre_session_secret_aleatoire
 2. Créer un projet ou sélectionner un projet existant
 3. Activer l'API YouTube Data API v3
 4. Créer des identifiants OAuth 2.0
-5. Ajouter `http://localhost:3000/auth/youtube/callback` aux URIs de redirection
+5. Ajouter `http://localhost:8458/auth/youtube/callback` aux URIs de redirection
 
 ### Twitch
 1. Aller sur [Twitch Developers](https://dev.twitch.tv/console/apps)
 2. Créer une nouvelle application
-3. Ajouter `http://localhost:3000/auth/twitch/callback` aux URIs de redirection OAuth
+3. Ajouter `http://localhost:8458/auth/twitch/callback` aux URIs de redirection OAuth
 4. Noter le Client ID et générer un Client Secret
 
 ### Discord Bot
@@ -110,7 +110,7 @@ npm run dev
 
 ## 🌐 Interface Web
 
-L'interface web est accessible sur `http://localhost:3000` et propose :
+L'interface web est accessible sur `http://localhost:8458` et propose :
 - Page d'accueil avec informations sur le système
 - Endpoints OAuth2 pour YouTube et Twitch
 - API REST pour les vérifications

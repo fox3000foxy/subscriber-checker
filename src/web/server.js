@@ -4,14 +4,15 @@ const cors = require('cors');
 const path = require('path');
 const authRoutes = require('./routes/auth');
 const verificationRoutes = require('./routes/verification');
+const configRoutes = require('./routes/config');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.WEB_PORT || 3000;
+const PORT = process.env.WEB_PORT || 8458;
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    origin: ['http://localhost:8458', 'http://127.0.0.1:8458'],
     credentials: true
 }));
 
@@ -35,10 +36,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api', verificationRoutes);
+app.use('/config', configRoutes);
 
 // Route principale
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Route de configuration de serveur
+app.get('/config/guild/:guildId', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'config.html'));
 });
 
 // Route de statut

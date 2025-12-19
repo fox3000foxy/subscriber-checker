@@ -16,12 +16,22 @@ const twitchService = new TwitchService(
 /**
  * Vérifier l'abonnement YouTube d'un utilisateur
  */
-router.get('/youtube/subscription/:discordId', async (req, res) => {
-    const { discordId } = req.params;
-    const { channelId = process.env.YOUTUBE_CHANNEL_ID } = req.query;
-
+router.get('/youtube/subscription/:guildId/:discordId', async (req, res) => {
+    const { guildId, discordId } = req.params;
+    
     try {
-        const user = db.getUser(discordId);
+        // Récupérer la configuration du serveur
+        const guildConfig = await db.getGuildConfig(guildId);
+        if (!guildConfig || !guildConfig.youtube_channel_id) {
+            return res.status(400).json({ 
+                error: 'Aucune chaîne YouTube configurée pour ce serveur',
+                subscribed: false
+            });
+        }
+        
+        const channelId = guildConfig.youtube_channel_id;
+
+        const user = await db.getUser(discordId);
         if (!user) {
             return res.status(404).json({ 
                 error: 'Utilisateur non trouvé',
@@ -29,7 +39,7 @@ router.get('/youtube/subscription/:discordId', async (req, res) => {
             });
         }
 
-        const token = db.getYouTubeToken(user.id);
+        const token = await db.getYouTubeToken(user.id);
         if (!token) {
             return res.status(400).json({ 
                 error: 'Aucun token YouTube trouvé pour cet utilisateur',
@@ -51,7 +61,7 @@ router.get('/youtube/subscription/:discordId', async (req, res) => {
         const result = await youtubeService.checkSubscription(token.access_token, channelId);
         
         // Log de la vérification
-        db.logVerification(
+        await db.logVerification(
             user.id, 
             'youtube', 
             'subscription', 
@@ -77,12 +87,22 @@ router.get('/youtube/subscription/:discordId', async (req, res) => {
 /**
  * Vérifier le follow Twitch d'un utilisateur
  */
-router.get('/twitch/follow/:discordId', async (req, res) => {
-    const { discordId } = req.params;
-    const { channelName = process.env.TWITCH_CHANNEL_NAME } = req.query;
-
+router.get('/twitch/follow/:guildId/:discordId', async (req, res) => {
+    const { guildId, discordId } = req.params;
+    
     try {
-        const user = db.getUser(discordId);
+        // Récupérer la configuration du serveur
+        const guildConfig = await db.getGuildConfig(guildId);
+        if (!guildConfig || !guildConfig.twitch_channel_name) {
+            return res.status(400).json({ 
+                error: 'Aucune chaîne Twitch configurée pour ce serveur',
+                following: false
+            });
+        }
+        
+        const channelName = guildConfig.twitch_channel_name;
+
+        const user = await db.getUser(discordId);
         if (!user) {
             return res.status(404).json({ 
                 error: 'Utilisateur non trouvé',
@@ -90,7 +110,7 @@ router.get('/twitch/follow/:discordId', async (req, res) => {
             });
         }
 
-        const token = db.getTwitchToken(user.id);
+        const token = await db.getTwitchToken(user.id);
         if (!token) {
             return res.status(400).json({ 
                 error: 'Aucun token Twitch trouvé pour cet utilisateur',
@@ -121,7 +141,7 @@ router.get('/twitch/follow/:discordId', async (req, res) => {
         const result = await twitchService.checkFollow(token.access_token, channelInfo.id);
         
         // Log de la vérification
-        db.logVerification(
+        await db.logVerification(
             user.id, 
             'twitch', 
             'follow', 
@@ -148,12 +168,22 @@ router.get('/twitch/follow/:discordId', async (req, res) => {
 /**
  * Vérifier l'abonnement Twitch d'un utilisateur
  */
-router.get('/twitch/subscription/:discordId', async (req, res) => {
-    const { discordId } = req.params;
-    const { channelName = process.env.TWITCH_CHANNEL_NAME } = req.query;
-
+router.get('/twitch/subscription/:guildId/:discordId', async (req, res) => {
+    const { guildId, discordId } = req.params;
+    
     try {
-        const user = db.getUser(discordId);
+        // Récupérer la configuration du serveur
+        const guildConfig = await db.getGuildConfig(guildId);
+        if (!guildConfig || !guildConfig.twitch_channel_name) {
+            return res.status(400).json({ 
+                error: 'Aucune chaîne Twitch configurée pour ce serveur',
+                subscribed: false
+            });
+        }
+        
+        const channelName = guildConfig.twitch_channel_name;
+
+        const user = await db.getUser(discordId);
         if (!user) {
             return res.status(404).json({ 
                 error: 'Utilisateur non trouvé',
@@ -161,7 +191,7 @@ router.get('/twitch/subscription/:discordId', async (req, res) => {
             });
         }
 
-        const token = db.getTwitchToken(user.id);
+        const token = await db.getTwitchToken(user.id);
         if (!token) {
             return res.status(400).json({ 
                 error: 'Aucun token Twitch trouvé pour cet utilisateur',
@@ -195,7 +225,7 @@ router.get('/twitch/subscription/:discordId', async (req, res) => {
         const logResult = result.subscribed ? 
             `subscribed_tier_${result.tier || 'unknown'}` : 'not_subscribed';
         
-        db.logVerification(user.id, 'twitch', 'subscription', logResult);
+        await db.logVerification(user.id, 'twitch', 'subscription', logResult);
 
         res.json({
             subscribed: result.subscribed,
@@ -220,26 +250,39 @@ router.get('/twitch/subscription/:discordId', async (req, res) => {
 /**
  * Vérification complète d'un utilisateur (YouTube + Twitch)
  */
-router.get('/check-all/:discordId', async (req, res) => {
-    const { discordId } = req.params;
+router.get('/check-all/:guildId/:discordId', async (req, res) => {
+    const { guildId, discordId } = req.params;
     
     try {
-        const user = db.getUser(discordId);
+        // Récupérer la configuration du serveur
+        const guildConfig = await db.getGuildConfig(guildId);
+        if (!guildConfig) {
+            return res.status(400).json({ error: 'Configuration du serveur non trouvée' });
+        }
+        
+        const user = await db.getUser(discordId);
         if (!user) {
             return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
         const results = {
+            guild: {
+                guildId: guildConfig.guild_id,
+                guildName: guildConfig.guild_name
+            },
             user: {
                 discordId: user.discord_id,
                 username: user.discord_username
             },
             youtube: {
+                required: guildConfig.require_youtube,
                 hasToken: false,
                 subscribed: false,
                 error: null
             },
             twitch: {
+                followRequired: guildConfig.require_twitch_follow,
+                subRequired: guildConfig.require_twitch_sub,
                 hasToken: false,
                 following: false,
                 subscribed: false,
@@ -250,43 +293,49 @@ router.get('/check-all/:discordId', async (req, res) => {
         };
 
         // Vérification YouTube
-        const youtubeToken = db.getYouTubeToken(user.id);
-        if (youtubeToken && (!youtubeToken.expires_at || new Date(youtubeToken.expires_at) > new Date())) {
-            results.youtube.hasToken = true;
-            try {
-                const ytResult = await youtubeService.checkSubscription(
-                    youtubeToken.access_token, 
-                    process.env.YOUTUBE_CHANNEL_ID
-                );
-                results.youtube.subscribed = ytResult.subscribed;
-                results.youtube.error = ytResult.error;
-            } catch (error) {
-                results.youtube.error = 'Erreur lors de la vérification YouTube';
+        if (guildConfig.require_youtube && guildConfig.youtube_channel_id) {
+            const youtubeToken = await db.getYouTubeToken(user.id);
+            if (youtubeToken && (!youtubeToken.expires_at || new Date(youtubeToken.expires_at) > new Date())) {
+                results.youtube.hasToken = true;
+                try {
+                    const ytResult = await youtubeService.checkSubscription(
+                        youtubeToken.access_token, 
+                        guildConfig.youtube_channel_id
+                    );
+                    results.youtube.subscribed = ytResult.subscribed;
+                    results.youtube.error = ytResult.error;
+                } catch (error) {
+                    results.youtube.error = 'Erreur lors de la vérification YouTube';
+                }
             }
         }
 
         // Vérification Twitch
-        const twitchToken = db.getTwitchToken(user.id);
-        if (twitchToken && (!twitchToken.expires_at || new Date(twitchToken.expires_at) > new Date())) {
-            results.twitch.hasToken = true;
-            
-            const channelInfo = await twitchService.getChannelInfo(process.env.TWITCH_CHANNEL_NAME);
-            if (channelInfo) {
-                try {
-                    // Vérifier le follow
-                    const followResult = await twitchService.checkFollow(twitchToken.access_token, channelInfo.id);
-                    results.twitch.following = followResult.following;
-                    
-                    // Vérifier l'abonnement
-                    const subResult = await twitchService.checkSubscription(twitchToken.access_token, channelInfo.id);
-                    results.twitch.subscribed = subResult.subscribed;
-                    results.twitch.tier = subResult.tier;
-                    
-                    if (followResult.error || subResult.error) {
-                        results.twitch.error = followResult.error || subResult.error;
+        if ((guildConfig.require_twitch_follow || guildConfig.require_twitch_sub) && guildConfig.twitch_channel_name) {
+            const twitchToken = await db.getTwitchToken(user.id);
+            if (twitchToken && (!twitchToken.expires_at || new Date(twitchToken.expires_at) > new Date())) {
+                results.twitch.hasToken = true;
+                
+                const channelInfo = await twitchService.getChannelInfo(guildConfig.twitch_channel_name);
+                if (channelInfo) {
+                    try {
+                        // Vérifier le follow si requis
+                        if (guildConfig.require_twitch_follow) {
+                            const followResult = await twitchService.checkFollow(twitchToken.access_token, channelInfo.id);
+                            results.twitch.following = followResult.following;
+                            if (followResult.error) results.twitch.error = followResult.error;
+                        }
+                        
+                        // Vérifier l'abonnement si requis
+                        if (guildConfig.require_twitch_sub) {
+                            const subResult = await twitchService.checkSubscription(twitchToken.access_token, channelInfo.id);
+                            results.twitch.subscribed = subResult.subscribed;
+                            results.twitch.tier = subResult.tier;
+                            if (subResult.error && !results.twitch.error) results.twitch.error = subResult.error;
+                        }
+                    } catch (error) {
+                        results.twitch.error = 'Erreur lors de la vérification Twitch';
                     }
-                } catch (error) {
-                    results.twitch.error = 'Erreur lors de la vérification Twitch';
                 }
             }
         }
@@ -302,17 +351,17 @@ router.get('/check-all/:discordId', async (req, res) => {
 /**
  * Obtenir l'historique des vérifications d'un utilisateur
  */
-router.get('/history/:discordId', (req, res) => {
+router.get('/history/:discordId', async (req, res) => {
     const { discordId } = req.params;
     const { limit = 20 } = req.query;
 
     try {
-        const user = db.getUser(discordId);
+        const user = await db.getUser(discordId);
         if (!user) {
             return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
-        const history = db.getVerificationHistory(user.id, parseInt(limit));
+        const history = await db.getVerificationHistory(user.id, parseInt(limit));
         
         res.json({
             user: {
