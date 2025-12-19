@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Discord - OAuth Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #7289da, #99aab5);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .platform-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .platform-section:hover {
+            border-color: #3498db;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.1);
+        }
+
+        .platform-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 8px;
+        }
+
+        .youtube-icon {
+            background: #ff0000;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .twitch-icon {
+            background: #9146ff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .platform-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .description {
+            color: #7f8c8d;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        .features li {
+            padding: 0.3rem 0;
+            color: #34495e;
+        }
+
+        .features li::before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .oauth-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .oauth-title {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .oauth-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .status {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .status.info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left: 4px solid #2196f3;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            color: #95a5a6;
+            font-size: 0.9rem;
+        }
+
+        .version {
+            display: inline-block;
+            background: #ecf0f1;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .platform-header {
+                flex-direction: column;
+            }
+            
+            .platform-icon {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🤖</div>
+        <h1>Bot Discord OAuth Manager</h1>
+        <p class="subtitle">Système de vérification d'abonnements YouTube et Twitch</p>
+
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-icon youtube-icon">YT</div>
+                <h3 class="platform-title">YouTube</h3>
+            </div>
+            <div class="description">
+                Vérification automatique des abonnements à votre chaîne YouTube.
+            </div>
+            <ul class="features">
+                <li>Vérification en temps réel des abonnements</li>
+                <li>OAuth2 sécurisé avec Google</li>
+                <li>Tokens de rafraîchissement automatique</li>
+                <li>Historique des vérifications</li>
+            </ul>
+        </div>
+
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-icon twitch-icon">TV</div>
+                <h3 class="platform-title">Twitch</h3>
+            </div>
+            <div class="description">
+                Vérification des follows et abonnements Twitch avec détection des tiers.
+            </div>
+            <ul class="features">
+                <li>Vérification des follows de chaîne</li>
+                <li>Détection des abonnements par tier (Tier 1, 2, 3)</li>
+                <li>Identification des sub gifted</li>
+                <li>OAuth2 sécurisé avec Twitch</li>
+            </ul>
+        </div>
+
+        <div class="oauth-section">
+            <h4 class="oauth-title">🔐 Authentification OAuth2</h4>
+            <p class="oauth-info">
+                Ce système utilise OAuth2 pour accéder de manière sécurisée à vos comptes YouTube et Twitch. 
+                Aucun mot de passe n'est stocké. Les tokens d'accès sont chiffrés et peuvent être révoqués à tout moment.
+            </p>
+            <p class="oauth-info">
+                <strong>Permissions demandées :</strong><br>
+                • YouTube : Lecture des abonnements<br>
+                • Twitch : Lecture des follows et abonnements
+            </p>
+        </div>
+
+        <div class="status info">
+            <strong>ℹ️ Comment utiliser :</strong><br>
+            Utilisez les commandes du bot Discord pour initier l'authentification OAuth2 et vérifier vos abonnements.
+        </div>
+
+        <div class="footer">
+            <p>🛡️ Système sécurisé • 🔄 Mis à jour automatiquement • 📊 Historique complet</p>
+            <div class="version">v1.0.0</div>
+        </div>
+    </div>
+
+    <script>
+        // Vérification du statut du serveur
+        fetch('/status')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Statut du serveur:', data);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la vérification du statut:', error);
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "name": "discord-oauth-bot",
+  "version": "1.0.0",
+  "description": "Bot Discord avec OAuth2 YouTube/Twitch pour vérifier les abonnements",
+  "main": "src/bot.js",
+  "scripts": {
+    "start": "node src/bot.js",
+    "dev": "nodemon src/bot.js",
+    "web": "node src/web/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["discord", "bot", "oauth2", "youtube", "twitch"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "better-sqlite3": "^9.2.2",
+    "body-parser": "^2.2.1",
+    "cors": "^2.8.5",
+    "discord.js": "^14.25.1",
+    "dotenv": "^16.3.1",
+    "express": "^5.2.1",
+    "express-session": "^1.17.3",
+    "googleapis": "^128.0.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-oauth2": "^1.7.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
